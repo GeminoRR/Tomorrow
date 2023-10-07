@@ -1,0 +1,238 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tomorrow - Todo app</title>
+    <link rel="shortcut icon" href="ressources/logo.svg" type="image/x-icon">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="styles/style.css">
+    <link rel="stylesheet" href="styles/app.css">
+</head>
+<body>
+
+    <!-- PRE-LOADER -->
+    <div class="loader-bg" id="loader">
+        <div class="loader"></div>
+    </div>
+
+    <!-- MENU -->
+    <div class="menu-container" style="display: none;" id="menu_container">
+        
+        <!-- ADD TASK -->
+        <div class="menu" id="menu_addtask" hidden>
+            <p class="menu-title">Créer une nouvelle tache</p>
+
+            <p>Date de la tache</p>
+            <input type="date" class="lambda-input w100" id="menu_addtask_date">
+
+            <p class="menu-text">Nom de la tache</p>
+            <input type="text" class="lambda-input w100" id="menu_addtask_name" placeholder="Nom de la tache">
+
+            <p class="menu-text">Description</p>
+            <input type="text" class="lambda-input w100" id="menu_addtask_desc" placeholder="Description">
+        
+            <p class="menu-text">Catégorie</p>
+            <select id="menu_addtask_cat" class="lambda-input w100">
+            </select>
+
+            <div class="menu-btns">
+                <button class="lambda-btn grey-btn" id="menu_addtask_cancel">Annuler</button>
+                <button class="lambda-btn" id="menu_addtask_validate">Valider</button>
+            </div>
+        </div>
+
+        <!-- SHOW TASK -->
+        <div class="menu" id="menu_showtask" hidden>
+            <p class="menu-title" id="menu_showtask_name"></p>
+            <p id="menu_showtask_desc" class="menu-text"></p>
+
+            <label class="menu-checkbox"><input type="checkbox" id="menu_showtask_checkbox">Tache fini</label>
+            
+            <div class="menu-btns">
+                <button class="lambda-btn" id="menu_showtask_close">Fermer</button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- NAVIGATION -->
+    <nav>
+
+        <div class="nav-title">
+            <img src="ressources/logo.svg" alt="Tomorrow's logo" id="nav_logo">
+            <p>Tomorrow</p>
+        </div>
+
+        <div class="nav-section" id="nav_buttons">
+            <div class="nav-button" id="nav_btn_home">
+                <img src="ressources/app/home.png">
+                <p>Accueil</p>
+            </div>
+            <div class="nav-button" id="nav_btn_agenda">
+                <img src="ressources/app/agenda.png">
+                <p>Agenda</p>
+            </div>
+            <div class="nav-button" id="nav_btn_categories">
+                <img src="ressources/app/categories.png">
+                <p>Catégories</p>
+            </div>
+        </div>
+
+        <div class="nav-section" style="padding-bottom: 20px;">
+            <div class="nav-button" id="nav_btn_settings">
+                <img src="ressources/app/settings.png">
+                <p>Paramètres</p>
+            </div>
+            <div class="nav-button" id="nav_btn_logout">
+                <img src="ressources/app/logout.png">
+                <p>Se déconecter</p>
+            </div>
+        </div>
+
+    </nav>
+
+    <!-- CONTENT -->
+    <div class="content" id="content">
+
+        <!-- AGENDA -->
+        <div class="agenda" id="page_agenda" style="display: none;">
+            
+            <div class="agenda-header">
+                <h1>Agenda</h1>
+                <div class="agenda-header-btns">
+                    <button class="lambda-btn grey-btn" id="agenda_toggle_checked_tasks">Montrer les taches fini</button>
+                    <button class="lambda-btn" id="agenda_addtask_btn">Ajouter une tache</button>
+                </div>
+            </div>
+                    
+            <div class="agenda-container">
+
+                <div class="agenda-day" id="agenda_day1">
+
+                    <p class="agenda-day-subtitle" id="agenda_day1_date">25/09</p>
+                    <p class="agenda-day-title">Lundi</p>
+
+                    <div class="agenda-day-content" id="agenda_day1_content">
+
+                        <!-- AUTO GENERATED -->
+
+                    </div>
+
+                </div>
+
+                <div class="agenda-day" id="agenda_day2">
+
+                    <p class="agenda-day-subtitle" id="agenda_day2_date">26/09</p>
+                    <p class="agenda-day-title">Mardi</p>
+
+                    <div class="agenda-day-content" id="agenda_day2_content">
+
+                        <div class="agenda-card">
+                            <p class="agenda-card-title">Math</p>
+                            <p class="agenda-card-subtitle">TDm4</p>
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="agenda-day" id="agenda_day3">
+
+                    <p class="agenda-day-subtitle" id="agenda_day3_date">27/09</p>
+                    <p class="agenda-day-title">Mercredi</p>
+
+                    <div class="agenda-day-content" id="agenda_day3_content">
+
+                        <!-- AUTO GENERATED -->
+
+                    </div>
+
+                </div>
+
+                <div class="agenda-day" id="agenda_day4">
+
+                    <p class="agenda-day-subtitle" id="agenda_day4_date">28/09</p>
+                    <p class="agenda-day-title">Jeudi</p>
+
+                    <div class="agenda-day-content" id="agenda_day4_content">
+
+                        <!-- AUTO GENERATED -->
+
+                    </div>
+
+                </div>
+
+                <div class="agenda-day" id="agenda_day5">
+
+                    <p class="agenda-day-subtitle" id="agenda_day5_date">29/09</p>
+                    <p class="agenda-day-title">Vendredi</p>
+
+                    <div class="agenda-day-content" id="agenda_day5_content">
+
+                        <!-- AUTO GENERATED -->
+
+                    </div>
+
+                </div>
+
+                <div class="agenda-day" id="agenda_day6">
+
+                    <p class="agenda-day-subtitle" id="agenda_day6_date">30/09</p>
+                    <p class="agenda-day-title">Samedi</p>
+
+                    <div class="agenda-day-content" id="agenda_day6_content">
+
+                        <!-- AUTO GENERATED -->
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="week-container">
+                <div class="week-btn" id="week_left">&lt;</div>
+                <p class="week-name" id="week_name">Semaine du 25</p>
+                <div class="week-btn" id="week_right">&gt;</div>
+            </div>
+        
+        </div>
+
+        <!-- HOME -->
+        <div class="home" id="page_home" style="display: none;">
+            <h1>Home</h1>
+        </div>
+
+        <!-- CATEGORIES -->
+        <div class="categories" id="page_categories" style="display: none;">
+            <h1>Categories</h1>
+        </div>
+
+        <!-- SETTINGS -->
+        <div class="settings" id="page_settings" style="display: none;">
+            <h1>Paramètres</h1>
+
+            <p>Couleur de l'interface</p>
+            <input type="color" id="settings_color">
+
+            <p>Afficher le Samedi</p>
+            <input type="checkbox" id="settings_saturday">
+
+            <p>Suprimmer votre compte</p>
+            <button class="red-btn" id="delete_account_btn">Suprimmer le compte</button>
+
+        </div>
+
+    </div>
+
+    <!-- SCRIPT -->
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script type="module" src="scripts/firebase.js"></script>
+    <script type="module" src="scripts/app.js"></script>
+
+</body>
+</html>

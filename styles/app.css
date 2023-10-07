@@ -1,0 +1,349 @@
+/* BODY */
+body{
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    flex-direction: row;
+}
+
+/* NAV */
+nav{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: space-between;
+
+    background-color: white;
+    border-right: 1px solid rgb(230, 230, 230);
+    
+    min-width: 280px;
+}
+.nav-title{
+    user-select: none;
+    padding: 30px;
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+    align-items: center;
+}
+.nav-title img{
+    width: 50px;
+    height: 50px;
+}
+.nav-title svg{
+    width: 50px;
+    height: 50px;
+}
+.nav-title svg > g > rect{
+    fill: var(--accent);
+}
+.nav-title p{
+    font-size: 22px;
+}
+
+.nav-section{
+    width: 100%;
+}
+.nav-button{
+    padding: 10px 30px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    cursor: pointer;
+    user-select: none;
+}
+.nav-button:hover{
+    background-color: whitesmoke;
+}
+.nav-button-active p{
+    color: black;
+}
+.nav-button-active{
+    background-color: rgb(250, 250, 250);
+    border-right: solid 3px var(--accent);
+}
+.nav-button img{
+    width: 35px;
+    height: 35px;
+    margin-right: 15px;
+}
+.nav-button p{
+    font-size: 18px;
+    color: grey;
+}
+
+/* CONTENT */
+.content{
+    width: 100%;
+    height: 100vh;
+}
+.content > div{
+    width: 100%;
+    height: 100%;
+    padding: 30px;
+    background-color: whitesmoke;
+}
+
+/* AGENDA */
+.agenda{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-image: radial-gradient(rgb(230, 230, 230) 2px, transparent 2px);
+    background-size: 50px 50px;
+}
+
+.agenda-container{
+    width: 100%;
+    height: 80%;
+    background-color: white;
+    border-radius: 20px;
+    /*box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;*/
+    border: 2px solid rgb(230, 230, 230);
+
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+.agenda-day{
+    width: calc(100% / 5);
+    padding: 15px 15px;
+}
+.agenda-day-today{
+    background-color: rgba(var(--accentValues), 0.05) !important;
+}
+.agenda-day-subtitle{
+    font-size: 14px;
+    color: grey;
+}
+.agenda-day-title{
+    font-size: 18px;
+    color: black;
+    font-weight: 500;
+    margin-top: 5px;
+}
+.agenda-day-content{
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+
+.agenda-card{
+    user-select: none;
+    width: 100%;
+    padding: 15px;
+    border-radius: 8px;
+    --card-color: 254, 185, 46;
+    background-color: rgba(var(--card-color), 0.15);
+    border-left: 8px solid rgb(var(--card-color));
+    cursor: pointer;
+}
+.agenda-card-title{
+    color: black;
+    font-size: 18px;
+}
+.agenda-card-subtitle{
+    color: black;
+    font-size: 14px;
+    font-weight: 300;
+}
+
+.week-container{
+    width: 100%;
+    height: 40px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+}
+.week-btn{
+    color: white;
+    font-size: 22px;
+    font-weight: 800;
+    background-color: var(--accent);
+    border-radius: 10px;
+    width: 40px;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+    cursor: pointer;
+    transition-duration: 0.2s;
+}
+.week-btn:hover{
+    transform: scale(1.05);
+}
+.week-btn:active{
+    transform: scale(0.95);
+}
+.week-name{
+    height: 100%;
+    background-color: white;
+    padding: 10px;
+    border: 2px solid rgb(230, 230, 230);
+    border-radius: 10px;
+    font-size: 18px;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    font-size: 18px;
+}
+.agenda-header{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+.agenda-header-btns{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+/* SETTINGS */
+.settings{
+    display: flex;
+    flex-direction: column;
+}
+.settings p, button{
+    margin-top: 10px;
+}
+
+/* PRE LOADER */
+.loader-bg{
+    position: fixed;
+    z-index: 99999;
+    background-color: white;
+    width: 100%;
+    height: 100%;
+}
+.loader{
+    border: 0 solid transparent;
+    border-radius: 50%;
+    width: 150px;
+    height: 150px;
+    position: absolute;
+    top: calc(50vh - 75px);
+    left: calc(50vw - 75px);
+    transition-duration: 0.2s;
+}
+.loader:before, .loader:after{
+    content: '';
+    border: 1em solid var(--accent);
+    border-radius: 50%;
+    width: inherit;
+    height: inherit;
+    position: absolute;
+    top: 0;
+    left: 0;
+    animation: loader-anim 2s linear infinite;
+    opacity: 0;
+}
+.loader:before{
+    animation-delay: .5s;
+}
+@keyframes loader-anim {
+    0%{
+        transform: scale(0);
+        opacity: 0;
+    }
+    50%{
+        opacity: 1;
+    }
+    100%{
+        transform: scale(1);
+        opacity: 0;
+    }
+}
+.loader-end{
+    animation: 0.3s loader-end-anim ease-out forwards;
+}
+@keyframes loader-end-anim {
+    to{
+        opacity: 0;
+    }
+}
+
+/* MENU */
+.menu-container{
+    width: 100%;
+    height: 100vh;
+    position: fixed;
+    z-index: 999;
+    background-color: rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    transition-duration: 0.2s;
+}
+.menu{
+    padding: 30px;
+    background-color: white;
+    border: 2px solid rgb(230, 230, 230);
+    border-radius: 18px;
+
+    opacity: 0;
+    transform: translateY(-50px);
+    transition-duration: 0.2s;
+
+    min-width: 400px;
+}
+.menu-visible{
+    opacity: 1;
+    transform: none;
+}
+
+.menu .menu-title{
+    font-size: 25px;
+    color: var(--accent);
+    margin-bottom: 15px;
+}
+.menu .menu-text{
+    font-size: 16px;
+    color: black;
+    margin-top: 15px;
+}
+.menu input, select{
+    margin-top: 8px;
+}
+
+.menu .menu-btns{
+    margin-top: 15px;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 15px;
+}
+.menu .menu-btns > *{
+    margin-top: 0 !important;
+}
+
+.menu .menu-checkbox{
+    margin-top: 15px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+    width: 100%;
+    font-size: 16px;
+    color: black;
+    margin-top: 15px;
+    cursor: pointer;
+}
+.menu .menu-checkbox > *{
+    margin-top: 0 !important;
+}

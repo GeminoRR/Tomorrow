@@ -1,0 +1,70 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tomorrow - Another Todo app</title>
+    <link rel="shortcut icon" href="ressources/logo.svg" type="image/x-icon">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="styles/style.css">
+    <link rel="stylesheet" href="styles/signin.css">
+
+</head>
+<body>
+    
+    <div class="login">
+
+        <div class="login-container">
+            
+            <div id="login_pan">
+
+                <p class="login-title">Te revoilà</p>
+                <p class="login-subtitle">Connectez-vous pour accéder à votre todo liste.</p>
+    
+                <p class="login-text">E-mail</p>
+                <input type="email" placeholder="bob@gmail.com" class="input" id="login_email">
+    
+                <p class="login-text">Mot de passe</p>
+                <input type="password" class="input" id="login_password">
+    
+                <button class="blue-btn" style="margin-top: 30px;" id="login_btn">S'authentifier</button>
+    
+                <p class="login-text">Pas encore de compte ? <span style="color: var(--accent); cursor: pointer;" id="login_pan_create_account">Créé un compte</span></p>
+
+            </div>
+
+            <div id="create_pan" hidden>
+                
+                <p class="login-title">Bienvenu !</p>
+                <p class="login-subtitle">Tu vas voir c'est rapide.</p>
+    
+                <p class="login-text">E-mail</p>
+                <input type="email" placeholder="bob@gmail.com" class="input" id="create_email">
+    
+                <p class="login-text">Créé un mot de passe</p>
+                <input type="password" class="input" id="create_password">
+    
+                <p class="login-text" style="color: darkgray; font-size: 14px; font-style: italic;">En créant un compte vous acceptez les <a href="cu.html" style="color: darkgray;">conditions d'utilisation</a>.</p>
+                <button class="blue-btn" style="margin-top: 10;" id="create_btn">Créer un compte</button>
+    
+                <p class="login-text">Déjà un compte ? <span style="color: var(--accent); cursor: pointer;" id="create_pan_login">Identifie toi</span></p>
+
+            </div>
+        
+        </div>
+
+    </div>
+
+    <div class="side">
+    </div>
+
+    <!-- SCRIPTS -->
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    <script type="module" src="scripts/firebase.js"></script>
+    <script type="module" src="scripts/signin.js"></script>
+
+</body>
+</html>
