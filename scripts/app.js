@@ -80,6 +80,29 @@ onAuthStateChanged(auth, (user) => {
         window.location.href = "signin.html";
     }
 
+    //Get categories
+    get(ref(db, `users/${auth.currentUser.uid}/categories`))
+    .then((snapshot)=>{
+        
+        //Get categories
+        let new_categories = JSON.parse(snapshot.val());
+        if (!new_categories){
+            new_categories = {};
+        }
+
+        //Change color format
+        for (let key in new_categories){
+            new_categories[key].color = HexToColor(new_categories[key].color)
+        }
+
+        //Update variable
+        user_categories = new_categories;
+
+    })
+    .catch(error=>{
+        swal("Une erreur est survenu", 'Impossible de récupérer les données utilisateur.', "error");
+    });
+
     //Get user preferences
     get(ref(db, `users/${auth.currentUser.uid}/preferences`))
     .then(snapshot=>{
@@ -204,7 +227,7 @@ function pages_handle_btn(btn_id, page_id, on_page_start, on_page_end) {
 //Setup nav buttons
 pages_handle_btn('nav_btn_home', 'page_home');
 pages_handle_btn('nav_btn_agenda', 'page_agenda', show_agenda, hide_agenda);
-pages_handle_btn('nav_btn_categories', 'page_categories');
+pages_handle_btn('nav_btn_categories', 'page_categories', show_categories, hide_categories);
 pages_handle_btn('nav_btn_settings', 'page_settings');
 
 ///////////////////////
@@ -222,6 +245,30 @@ function StrToDate(str){
     const month = parseInt(dateParts[1]) - 1;
     const day = parseInt(dateParts[2]);
     return new Date(year, month, day);
+}
+
+////////////////////////
+////// COLOR UTIL //////
+////////////////////////
+function ColorToHex(color) {
+    function rgbToHex(rgb) {
+        let hex = Number(rgb).toString(16);
+        if (hex.length < 2) {
+            hex = "0" + hex;
+        }
+        return hex;
+    }
+    const [r, g, b] = color.split(", ");
+    const red = rgbToHex(r);
+    const green = rgbToHex(g);
+    const blue = rgbToHex(b);
+    return red + green + blue;
+}
+function HexToColor(hex){
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+    return `${r}, ${g}, ${b}`;
 }
 
 ////////////////////
@@ -322,7 +369,8 @@ function agenda_updateWeek(){
         }
 
         //Get current day events
-        let currentDayEvents = user_events[DateToStr(date)];
+        let currentDayKey = DateToStr(date);
+        let currentDayEvents = user_events[currentDayKey];
         if (currentDayEvents === undefined){
             continue;
         }
@@ -337,9 +385,11 @@ function agenda_updateWeek(){
             }
 
             //Get categories color
-            let card_color = user_categories[event.cat].color;
+            let card_color = user_categories[event.cat];
             if (card_color === undefined){
                 card_color = "var(--accentValues)";
+            } else {
+                card_color = card_color.color;
             }
 
             //Create card
@@ -358,7 +408,7 @@ function agenda_updateWeek(){
 
             //Card click evet
             card.onclick = ()=>{
-                showTask(event);
+                showTask(currentDayKey, y);
             };
 
         }
@@ -415,20 +465,99 @@ function pushEvents(){
 ////////////////////////
 ////// CATEGORIES //////
 ////////////////////////
-var user_categories = {
-    0:{
-        name: 'Mathématique',
-        color: '227, 114, 42'
-    },
-    1:{
-        name: 'Anglais',
-        color: '100, 256, 42'
-    },
-    2:{
-        name: 'Gestion de proj.',
-        color: '52, 124, 250'
+const categories_container = document.getElementById('categories_container');
+var user_categories = {};
+
+//Show categories page
+function show_categories(){
+
+    //Set listener
+    const eventsRef = ref(db, `users/${auth.currentUser.uid}/categories`);
+    onValue(eventsRef, (snapshot)=>{
+
+        //Get categories
+        let new_categories = JSON.parse(snapshot.val());
+        if (!new_categories){
+            new_categories = {};
+        }
+
+        //Change color format
+        for (let key in new_categories){
+            new_categories[key].color = HexToColor(new_categories[key].color)
+        }
+
+        //Update variable
+        user_categories = new_categories;
+
+        //Udate categories
+        categories_updateCategorie();
+
+    });
+
+}
+
+//Hide categories page
+function hide_categories(){
+    
+    //Detach listeners
+    off(ref(db, `users/${auth.currentUser.uid}/categories`)); 
+
+}
+
+//Update categories
+function categories_updateCategorie(){
+
+    //Remove all child
+    while (categories_container.firstChild){
+        categories_container.removeChild(categories_container.firstChild);
     }
-};
+
+    //Loop through all categories
+    for (let key in user_categories){
+
+        //Create div
+        let div = document.createElement('div');
+        div.style = `--card-color: ${user_categories[key].color}`;
+        let p = document.createElement('p');
+        p.textContent = user_categories[key].name;
+        div.appendChild(p);
+        let div2 = document.createElement('div');
+        let editBtn = document.createElement('button');
+        let editBtnImg = document.createElement('img');
+        editBtnImg.src = './ressources/app/edit.png';
+        editBtn.appendChild(editBtnImg);
+        div2.appendChild(editBtn);
+        let deleteBtn = document.createElement('button');
+        let deleteBtnImg = document.createElement('img');
+        deleteBtnImg.src = './ressources/app/delete.png';
+        deleteBtn.appendChild(deleteBtnImg);
+        div2.appendChild(deleteBtn);
+        div.appendChild(div2);
+        categories_container.appendChild(div);
+
+        //Edit categorie
+        editBtn.onclick = ()=>{
+            categories_update(key)
+        };
+
+        //Delete categorie
+        deleteBtn.onclick = ()=>{
+            swal({
+                title:"Supprimer cette catégorie ?",
+                text:"Cette action est définitive",
+                dangerMode: true,
+                buttons: true,
+              }).then((result) => {
+                if (result){
+                    delete user_categories[key];
+                    pushCategories();
+                }
+            });
+        };
+
+    }
+
+}
 
 //////////////////////
 ////// ADD TASK //////
@@ -454,7 +583,7 @@ document.getElementById('agenda_addtask_btn').addEventListener('click', ()=>{
         menu_addtask_cat.appendChild(option);
     }
     showMenu("menu_addtask");
-    menu_addtask_name.focus();
+    menu_addtask_date.focus();
 });
 
 //Cancel
@@ -494,24 +623,46 @@ const menu_showtask_name = document.getElementById('menu_showtask_name');
 const menu_showtask_desc = document.getElementById('menu_showtask_desc');
 const menu_showtask_close = document.getElementById('menu_showtask_close');
 const menu_showtask_checkbox = document.getElementById('menu_showtask_checkbox');
+const menu_showtask_delete = document.getElementById('menu_showtask_delete');
 
 menu_showtask_close.onclick = ()=>{
     menu_container.click();
 }
 
-function showTask(event) {
+function showTask(eventDay, index) {
 
+    //Get event
+    let event = user_events[eventDay][index];
+
+    //Load event menu
     showMenu('menu_showtask');
     menu_showtask_name.textContent = event.title;
     menu_showtask_desc.textContent = event.desc;
     menu_showtask_checkbox.checked = event.checked;
 
+    //Check event
     menu_showtask_checkbox.onclick = ()=>{
 
         menu_container.click();
         event.checked = menu_showtask_checkbox.checked;
         pushEvents();
 
+    }
+
+    //Delete event
+    menu_showtask_delete.onclick = ()=>{
+        swal({
+            title:"Supprimer cette tache ?",
+            text:"Cette action est définitive",
+            dangerMode: true,
+            buttons: true,
+          }).then((result) => {
+            if (result){
+                menu_container.click();
+                user_events[eventDay].splice(index, 1);
+                pushEvents();
+            }
+        });
     }
 
 }
@@ -548,5 +699,102 @@ function showMenu(menuID) {
             menu_container.click();
         }
     }
+
+}
+
+///////////////////////////
+////// ADD CATEGORIE //////
+///////////////////////////
+const menu_addcategorie_name = document.getElementById('menu_addcategorie_name');
+const menu_addcategorie_color = document.getElementById('menu_addcategorie_color');
+const menu_addcategorie_cancel = document.getElementById('menu_addcategorie_cancel');
+const menu_addcategorie_validate = document.getElementById('menu_addcategorie_validate');
+
+document.getElementById('categories_addcategorie').addEventListener('click', ()=>{
+    menu_addcategorie_name.value = '';
+    menu_addcategorie_color.value = '#2C5CE9';
+    showMenu("menu_addcategorie");
+    menu_addcategorie_name.focus();
+});
+
+//Cancel
+menu_addcategorie_cancel.onclick = ()=>{
+    menu_container.click();
+}
+
+//Add categories
+menu_addcategorie_validate.onclick = ()=>{
+    
+    //Close menu
+    menu_container.click();
+    
+    //Get day
+    let id = 0;
+    while (user_categories[id] !== undefined){
+        id += 1;
+    }
+
+    //Add categorie
+    user_categories[id] = {
+        name: menu_addcategorie_name.value,
+        color: HexToColor(menu_addcategorie_color.value.substr(1))
+    }
+
+    //Push modification to database
+    pushCategories();
+
+}
+
+///////////////////////////
+////// ADD CATEGORIE //////
+///////////////////////////
+const menu_updatecategorie_name = document.getElementById('menu_addcategorie_name');
+const menu_updatecategorie_color = document.getElementById('menu_addcategorie_color');
+const menu_updatecategorie_cancel = document.getElementById('menu_addcategorie_cancel');
+const menu_updatecategorie_validate = document.getElementById('menu_addcategorie_validate');
+
+function categories_update(key){
+    menu_updatecategorie_name.value = user_categories[key].name;
+    menu_updatecategorie_color.value = "#" + ColorToHex(user_categories[key].color);
+    showMenu("menu_addcategorie");
+    menu_updatecategorie_name.focus();
+
+    //Update categories
+    menu_updatecategorie_validate.onclick = ()=>{
+
+        //Close menu
+        menu_container.click();
+
+        //Add categorie
+        user_categories[key] = {
+            name: menu_updatecategorie_name.value,
+            color: HexToColor(menu_updatecategorie_color.value.substr(1))
+        }
+
+        //Push modification to database
+        pushCategories();
+
+    }
+
+};
+
+//Cancel
+menu_updatecategorie_cancel.onclick = ()=>{
+    menu_container.click();
+}
+
+/////////////////////////////
+////// PUSH CATEGORIES //////
+/////////////////////////////
+function pushCategories(){
+
+    //Convert
+    for (let key in user_categories){
+        user_categories[key].color = ColorToHex(user_categories[key].color);
+    }
+    //Push to database
+    update(ref(db, `users/${auth.currentUser.uid}`),{
+        categories: JSON.stringify(user_categories)
+    });
 
 }

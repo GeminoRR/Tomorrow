@@ -213,9 +213,67 @@ nav{
 .settings{
     display: flex;
     flex-direction: column;
+    justify-content: space-between;
+    background-image: radial-gradient(rgb(230, 230, 230) 2px, transparent 2px);
+    background-size: 50px 50px;
 }
-.settings p, button{
+.settings *{
     margin-top: 10px;
+}
+.settings > *:nth-child(1){
+    margin-top: 0;
+}
+.settings label{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+    cursor: pointer;
+}
+.settings label > *{
+    margin-top: 0;
+}
+.settings-container {
+    width: 100%;
+    height: calc(100% - 60px);
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-rows: 1fr 1fr 1fr;
+    gap: 15px 15px;
+    grid-auto-flow: row;
+    grid-template-areas:
+      "settings-iu-color settings-show-saturday settings-show-saturday ."
+      ". . . ."
+      "settings-delete-account settings-delete-account . .";
+}
+
+.settings-tile{
+    background-color: white;
+    border-radius: 10px;
+    border: 2px solid rgb(230, 230, 230);
+    padding: 15px;
+}
+.settings-tile-title{
+    color: var(--accent);
+    font-size: 16px;
+    font-weight: bold;
+}
+.settings-tile-text{
+    color: black;
+    font-size: 16px;
+}
+
+.settings-delete-account {
+    grid-area: settings-delete-account;
+}
+
+.settings-iu-color {
+    grid-area: settings-iu-color;
+}
+
+.settings-show-saturday {
+    grid-area: settings-show-saturday;
 }
 
 /* PRE LOADER */
@@ -346,4 +404,77 @@ nav{
 }
 .menu .menu-checkbox > *{
     margin-top: 0 !important;
+}
+
+/* CATEGORIES */
+.categories{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    background-image: radial-gradient(rgb(230, 230, 230) 2px, transparent 2px);
+    background-size: 50px 50px;
+}
+.categories-header{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+.categories-header-btns{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+.categories-container{
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 10px;
+    height: calc(100% - 60px); /* 60px = height of button on header + 10px margin top */
+}
+.categories-container > div{
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    background-color: rgba(var(--card-color), 0.15);
+    border: 2px solid rgb(var(--card-color));
+
+    border-radius: 8px;
+    padding: 10px;
+}
+.categories-container > div > p{
+    font-size: 16px;
+    color: black;
+}
+.categories-container > div > div{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+}
+.categories-container > div > div > button{
+    border: none;
+    outline: none;
+    background-color: rgba(var(--card-color), 0.15);
+    padding: 10px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition-duration: 0.2s;
+}
+.categories-container > div > div > button > img{
+    width: 20px;
+    height: 20px;
+}
+
+.categories-container > div > div > button:hover{
+    transform: scale(1.05);
+}
+.categories-container > div > div > button:active{
+    transform: scale(0.95);
 }

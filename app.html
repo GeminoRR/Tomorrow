@@ -53,10 +53,44 @@
             <label class="menu-checkbox"><input type="checkbox" id="menu_showtask_checkbox">Tache fini</label>
             
             <div class="menu-btns">
+                <button class="lambda-btn grey-btn" id="menu_showtask_delete">Supprimer</button>
                 <button class="lambda-btn" id="menu_showtask_close">Fermer</button>
             </div>
 
         </div>
+        
+        <!-- ADD CATEGORIE -->
+        <div class="menu" id="menu_addcategorie" hidden>
+            <p class="menu-title">Créer une nouvelle categorie</p>
+
+            <p class="menu-text">Nom de la categorie</p>
+            <input type="text" class="lambda-input w100" id="menu_addcategorie_name" placeholder="Nom de la categorie">
+
+            <p class="menu-text">Couleur</p>
+            <input type="color" class="lambda-input w100" id="menu_addcategorie_color">
+
+            <div class="menu-btns">
+                <button class="lambda-btn grey-btn" id="menu_addcategorie_cancel">Annuler</button>
+                <button class="lambda-btn" id="menu_addcategorie_validate">Valider</button>
+            </div>
+        </div>
+        
+        <!-- ADD CATEGORIE -->
+        <div class="menu" id="menu_updatecategorie" hidden>
+            <p class="menu-title">Modifier une categorie</p>
+
+            <p class="menu-text">Nom de la categorie</p>
+            <input type="text" class="lambda-input w100" id="menu_updatecategorie_name" placeholder="Nom de la categorie">
+
+            <p class="menu-text">Couleur</p>
+            <input type="color" class="lambda-input w100" id="menu_updatecategorie_color">
+
+            <div class="menu-btns">
+                <button class="lambda-btn grey-btn" id="menu_updatecategorie_cancel">Annuler</button>
+                <button class="lambda-btn" id="menu_updatecategorie_validate">Valider</button>
+            </div>
+        </div>
+
     </div>
 
     <!-- NAVIGATION -->
@@ -209,21 +243,47 @@
 
         <!-- CATEGORIES -->
         <div class="categories" id="page_categories" style="display: none;">
-            <h1>Categories</h1>
+            
+            <div class="categories-header">
+                <h1>Categories</h1>
+                <div class="categories-header-btns">
+                    <button class="lambda-btn" id="categories_addcategorie">Ajouter une categorie</button>
+                </div>
+            </div>
+
+            <div class="categories-container" id="categories_container">
+       
+                <!-- AUTO GENERATED -->
+
+            </div>
+
         </div>
 
         <!-- SETTINGS -->
         <div class="settings" id="page_settings" style="display: none;">
             <h1>Paramètres</h1>
 
-            <p>Couleur de l'interface</p>
-            <input type="color" id="settings_color_input">
+            <div class="settings-container">
 
-            <p>Afficher le Samedi</p>
-            <label><input type="checkbox" id="settings_saturday_input"> Afficher le samedi dans l'agenda</label>
+                <div class="settings-tile settings-delete-account">
+                    <p class="settings-tile-title">Suprimmer votre compte</p>
+                    <p class="settings-tile-text">Supprimer votre compte va supprimer toutes vos informations de nos bases de données. Ainsi, vous ne pourrez plus vous connecter et n'aurez plus aucun accès à vos taches. Cette action est irréversible.</p>
+                    <button class="lambda-btn red-btn w100" id="delete_account_btn">Suprimmer le compte</button>
+                </div>
 
-            <p>Suprimmer votre compte</p>
-            <button class="red-btn" id="delete_account_btn">Suprimmer le compte</button>
+                <div class="settings-tile settings-iu-color">
+                    <p class="settings-tile-title">Couleur de l'interface</p>
+                    <p class="settings-tile-text">Permets de changer la couleur d'accentuation de l'interface. Rechangeable à tout moment.</p>
+                    <input type="color" class="lambda-input w100" id="settings_color_input">
+                </div>
+
+                <div class="settings-tile settings-show-saturday">
+                    <p class="settings-tile-title">Afficher le Samedi</p>
+                    <p class="settings-tile-text">Peu de personnes travaillent le samedi, cette option est donc désactivée par défaut. En l'activant vous aurez accès à l'affichage du samedi sur votre agenda. Désactiver cette option ne supprimera pas les taches prévues les samedis.</p>
+                    <label><input type="checkbox" id="settings_saturday_input"> Afficher le samedi</label>
+                </div>
+
+            </div>
 
         </div>
 
