@@ -104,7 +104,7 @@
             <div class="agenda-header">
                 <h1>Agenda</h1>
                 <div class="agenda-header-btns">
-                    <button class="lambda-btn grey-btn" id="agenda_toggle_checked_tasks">Montrer les taches fini</button>
+                    <button class="lambda-btn grey-btn" id="agenda_show_checked_tasks_btn">Montrer les taches fini</button>
                     <button class="lambda-btn" id="agenda_addtask_btn">Ajouter une tache</button>
                 </div>
             </div>
@@ -217,10 +217,10 @@
             <h1>Paramètres</h1>
 
             <p>Couleur de l'interface</p>
-            <input type="color" id="settings_color">
+            <input type="color" id="settings_color_input">
 
             <p>Afficher le Samedi</p>
-            <input type="checkbox" id="settings_saturday">
+            <label><input type="checkbox" id="settings_saturday_input"> Afficher le samedi dans l'agenda</label>
 
             <p>Suprimmer votre compte</p>
             <button class="red-btn" id="delete_account_btn">Suprimmer le compte</button>

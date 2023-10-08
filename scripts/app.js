@@ -1,87 +1,44 @@
 /////////////////////
 ////// IMPORTS //////
 /////////////////////
-import { auth, onAuthStateChanged, signOut, db, ref, onValue, deleteUser, remove, get, update } from "./firebase.js";
-
-///////////////////////
-////// VARIABLES //////
-///////////////////////
-const loader = document.getElementById('loader');
-
-///////////////////
-////// DATES //////
-///////////////////
-function stringifyDate(date) {
-    const day = String(date.getDate()).padStart(2, '0');
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const year = String(date.getFullYear());
-
-    return `${day}/${month}/${year}`;
-}
-function parseDate(dateString) {
-    const [day, month, year] = dateString.split('/');
-    if (day && month && year) {
-        const parsedDay = parseInt(day, 10);
-        const parsedMonth = parseInt(month, 10) - 1; // Les mois dans JavaScript commencent à partir de 0
-        const parsedYear = parseInt(year, 10);
-
-        if (!isNaN(parsedDay) && !isNaN(parsedMonth) && !isNaN(parsedYear)) {
-            return new Date(parsedYear, parsedMonth, parsedDay);
-        }
-    }
-    return null; // Retourne null en cas de format de date invalide
-}
+import { auth, onAuthStateChanged, signOut, db, ref, onValue, off, deleteUser, remove, get, update } from "./firebase.js";
 
 //////////////////////
 ////// SETTINGS //////
 //////////////////////
-const settings_saturday = document.getElementById('settings_saturday');
-const settings_color = document.getElementById('settings_color');
+const settings_color_input = document.getElementById('settings_color_input');
+const settings_saturday_input = document.getElementById('settings_saturday_input');
 
 //Update color
-function updateAccent(){
-    
-    const r = parseInt(settings_color.value.substr(1,2), 16);
-    const g = parseInt(settings_color.value.substr(3,2), 16);
-    const b = parseInt(settings_color.value.substr(5,2), 16);
+function settings_UpdateAccentColor(){
+
+    const r = parseInt(settings_color_input.value.substr(1,2), 16);
+    const g = parseInt(settings_color_input.value.substr(3,2), 16);
+    const b = parseInt(settings_color_input.value.substr(5,2), 16);
 
     document.documentElement.style.setProperty('--accentValues', `${r}, ${g}, ${b}`);
 
 }
-settings_color.addEventListener('change', ()=>{
 
-    updateAccent();
-    update(ref(db, `users/${auth.currentUser.uid}`), {
-        accent: settings_color.value.substr(1)
+//Settings change color
+settings_color_input.addEventListener('change', ()=>{
+
+    //Update ui color
+    settings_UpdateAccentColor();
+
+    //Update database
+    update(ref(db, `users/${auth.currentUser.uid}/preferences`), {
+        accent: settings_color_input.value.substr(1)
     });
 
 });
 
-//Update saturday
-function updateSaturday(){
-    if (settings_saturday.checked){
-        daysPerWeek = 6;
-        days_container[5].hidden = false;
-        // console.log(current_monday.getDate())
-        // console.log(currentDay.getDate() + 2)
-        // if (currentDay.getDay() === 6 && current_monday.getDate() === currentDay.getDate() + 2){
-        //     current_monday.setDate(current_monday.getDate() - 7); // Ajoute 7 jours pour obtenir le lundi de la semaine prochaine
-        //     updateWeek();
-        // }
-    } else {
-        daysPerWeek = 5;
-        days_container[5].hidden = true;
-        // if (currentDay.getDay() === 6 && current_monday.getDate() === getMondayDate(currentDay).getDate()){
-        //     current_monday.setDate(current_monday.getDate() + 7); // Ajoute 7 jours pour obtenir le lundi de la semaine prochaine
-        //     updateWeek();
-        // }
-    }
-}
-settings_saturday.addEventListener('change', ()=>{
+//Settings change show_saturday
+settings_saturday_input.addEventListener('change', ()=>{
 
-    updateSaturday();
-    update(ref(db, `users/${auth.currentUser.uid}`), {
-        show_saturday: settings_saturday.checked
+    //Update database
+    update(ref(db, `users/${auth.currentUser.uid}/preferences`), {
+        show_saturday: settings_saturday_input.checked
     });
 
 });
@@ -110,37 +67,125 @@ document.getElementById('delete_account_btn').addEventListener('click', ()=>{
     });
 });
 
-////////////////////////
-////// CATEGORIES //////
-////////////////////////
-let categories = [{name:"red", color:"227, 114, 42", id:'0'}, {name:"yellow", color:"254, 185, 46", id:'1'}]
+//////////////////////////////
+////// USER PREFERENCES //////
+//////////////////////////////
+const loader = document.getElementById('loader');
 
-function updateCategories(){
+//Get user preferences from database
+onAuthStateChanged(auth, (user) => {
 
-}
+    //User is not connected
+    if (!user) {
+        window.location.href = "signin.html";
+    }
+
+    //Get user preferences
+    get(ref(db, `users/${auth.currentUser.uid}/preferences`))
+    .then(snapshot=>{
+
+        //Accent color
+        settings_color_input.value = '#' + snapshot.val().accent;
+        settings_UpdateAccentColor();
+    
+        //Show checked_task
+        agenda_show_checked_tasks_btn.setAttribute('checked', snapshot.val().show_checked_tasks);
+        if (snapshot.val().show_checked_tasks){
+            agenda_show_checked_tasks_btn.textContent = "Masquer les taches finies"
+        } else {
+            agenda_show_checked_tasks_btn.textContent = "Montrer les taches finies"
+        }
+
+        //Show saturday
+        settings_saturday_input.checked = snapshot.val().show_saturday;
+
+        //Load agenda
+        pages_nav_buttons[1].click();
+
+        //Remove loader
+        loader.classList.add('loader-end');
+        setTimeout(() => {
+            loader.hidden = true;
+        }, 300);
+        
+    })
+    .catch(error=>{
+        swal("Une erreur est survenu", 'Impossible de récupérer les données utilisateur.', "error");
+    });
+
+});
+
+///////////////////////////
+////// LOAD SVG ICON //////
+///////////////////////////
+const nav_logo = document.getElementById('nav_logo');
+fetch(nav_logo.getAttribute("src"))
+.then(response => response.text())
+.then(svgText => {
+    const parser = new DOMParser();
+    const svgDoc = parser.parseFromString(svgText, "image/svg+xml");    
+    nav_logo.parentNode.replaceChild(svgDoc.documentElement, nav_logo);
+})
+.catch(error => {
+    console.error("Une erreur s'est produite lors du chargement du SVG :", error);
+});
+
+//////////////////////
+////// SIGN OUT //////
+//////////////////////
+document.getElementById('nav_btn_logout').addEventListener('click', ()=>{
+    signOut(auth)
+    .catch((err)=>{
+        swal("Une erreur est survenu", err.message, "error");
+    });
+});
 
 ///////////////////
 ////// PAGES //////
 ///////////////////
-const pages = document.getElementById('content').children;
-const buttons = Array.from(document.getElementById('nav_buttons').children);
-buttons.push(document.getElementById('nav_btn_settings'));
-function nav_addbtn(btn_id, page_id, handler) {
-    document.getElementById(btn_id).addEventListener('click', ()=>{
+const pages_contents = document.getElementById('content').children;
+const pages_nav_buttons = Array.from(document.getElementById('nav_buttons').children);
+pages_nav_buttons.push(document.getElementById('nav_btn_settings'));
+
+function pages_handle_btn(btn_id, page_id, on_page_start, on_page_end) {
+    
+    //Set on_page_end
+    document.getElementById(page_id).addEventListener('on_page_end', ()=>{
+        if (on_page_end){
+            on_page_end();
+        }
+    });
+
+    //On click
+    document.getElementById(btn_id).onclick = ()=>{
+
+        //Already on page
+        if (document.getElementById(page_id).style.display === 'flex'){
+            return;
+        }
 
         //Remove all pages
-        for (let i = 0; i < pages.length; i++) {
-            const page = pages[i];
-            if (page.id === page_id){
-                page.style.display = 'flex';
-            } else {
+        for (let i = 0; i < pages_contents.length; i++) {
+            const page = pages_contents[i];
+            
+            if (page.style.display == 'flex' && page.id !== page_id){
+                //is displayed but need to be hidden
+                page.dispatchEvent(new CustomEvent('on_page_end'))
                 page.style.display = 'none';
+            } else {
+                //Other cases
+                if (page.id === page_id){
+                    page.style.display = 'flex';
+                } else {
+                    page.style.display = 'none';
+                }
             }
+
         }
 
         //Set nav buttons
-        for (let i = 0; i < buttons.length; i++) {
-            const button = buttons[i];
+        for (let i = 0; i < pages_nav_buttons.length; i++) {
+            const button = pages_nav_buttons[i];
             if (button.id === btn_id){
                 button.classList.add('nav-button-active');
             } else {
@@ -149,18 +194,35 @@ function nav_addbtn(btn_id, page_id, handler) {
         }
 
         //Handler
-        if (handler){
-            handler();
+        if (on_page_start){
+            on_page_start();
         }
 
-    });
+    };
 }
 
 //Setup nav buttons
-nav_addbtn('nav_btn_home', 'page_home', ()=>{});
-nav_addbtn('nav_btn_agenda', 'page_agenda', updateWeek);
-nav_addbtn('nav_btn_categories', 'page_categories', updateCategories);
-nav_addbtn('nav_btn_settings', 'page_settings', null);
+pages_handle_btn('nav_btn_home', 'page_home');
+pages_handle_btn('nav_btn_agenda', 'page_agenda', show_agenda, hide_agenda);
+pages_handle_btn('nav_btn_categories', 'page_categories');
+pages_handle_btn('nav_btn_settings', 'page_settings');
+
+///////////////////////
+////// DATE UTIL //////
+///////////////////////
+function DateToStr(date) {
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const day = date.getDate().toString().padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+function StrToDate(str){
+    const dateParts = str.split('-');
+    const year = parseInt(dateParts[0]);
+    const month = parseInt(dateParts[1]) - 1;
+    const day = parseInt(dateParts[2]);
+    return new Date(year, month, day);
+}
 
 ////////////////////
 ////// AGENDA //////
@@ -169,55 +231,81 @@ const days_container = [document.getElementById('agenda_day1'), document.getElem
 const days_contents = [document.getElementById('agenda_day1_content'), document.getElementById('agenda_day2_content'), document.getElementById('agenda_day3_content'), document.getElementById('agenda_day4_content'), document.getElementById('agenda_day5_content'), document.getElementById('agenda_day6_content')]
 const days_dates = [document.getElementById('agenda_day1_date'), document.getElementById('agenda_day2_date'), document.getElementById('agenda_day3_date'), document.getElementById('agenda_day4_date'), document.getElementById('agenda_day5_date'), document.getElementById('agenda_day6_date')]
 const week_name = document.getElementById('week_name');
-let events = [];
-let current_monday;
+const agenda_show_checked_tasks_btn = document.getElementById('agenda_show_checked_tasks_btn'); 
+
+var user_events = {};
+var current_monday;
 const currentDay = new Date();
-let daysPerWeek = 6;
 
 //Get this week monday
-function getMondayDate(day) {
-    const today = new Date(day);
-    const dayOfWeek = today.getDay(); // 0 pour dimanche, 1 pour lundi, ..., 6 pour samedi
-    const daysUntilMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
-    
-    const mondayDate = new Date(day);
-    mondayDate.setDate(today.getDate() - daysUntilMonday);
-    return mondayDate;
+function getMondayDate(date) {
+    const dayOfWeek = date.getDay();
+    const mondayOffset = dayOfWeek === 0 ? 1 : 8 - dayOfWeek;
+    const monday = new Date(date);
+    monday.setDate(date.getDate() + mondayOffset);
+    return monday;
 }
-
-//Get date
 current_monday = getMondayDate(currentDay);
-if (current_monday.getDay() === 0) { // Si aujourd'hui est un samedi (6) ou un dimanche (0)
-    current_monday.setDate(current_monday.getDate() + 7); // Ajoute 7 jours pour obtenir le lundi de la semaine prochaine
+
+//Show agenda page
+function show_agenda(){
+
+    //Show saturday
+    if (settings_saturday_input.checked){
+        days_container[5].hidden = false;
+    } else {
+        days_container[5].hidden = true;
+    }
+
+    //Set listener
+    const eventsRef = ref(db, `users/${auth.currentUser.uid}/events`);
+    onValue(eventsRef, (snapshot)=>{
+
+        //Get events
+        user_events = JSON.parse(snapshot.val());
+        if (!user_events){
+            user_events = {};
+        }
+
+        //Udate week
+        agenda_updateWeek();
+
+    });
+
+
 }
 
-//Get last week
-document.getElementById('week_left').addEventListener('click', ()=>{
-    current_monday.setDate(current_monday.getDate() - 7);
-    updateWeek();
-});
-
-//Get next week
-document.getElementById('week_right').addEventListener('click', ()=>{
-    current_monday.setDate(current_monday.getDate() + 7);
-    updateWeek();
-});
-
-//Update week
-function updateWeek(){
+//Hide agenda page
+function hide_agenda(){
     
+    //Detach listeners
+    off(ref(db, `users/${auth.currentUser.uid}/events`)); 
+
+}
+
+//Update week agenda
+function agenda_updateWeek(){
+
     //Current date
     week_name.textContent = `${current_monday.getDate().toString().padStart(2, '0')}/${(current_monday.getMonth() + 1).toString().padStart(2, '0')}/${current_monday.getFullYear()}`
+
+    //Days per week (for loop)
+    let daysPerWeek = 5;
+    if (settings_saturday_input.checked){
+        daysPerWeek = 6;
+    }
+
+    //Show checked tasks
+    let showCheckedTask = agenda_show_checked_tasks_btn.getAttribute('checked') === 'true';
 
     //Update events
     const date = new Date(current_monday);
     date.setDate(date.getDate() - 1);
     for (let i = 0; i < daysPerWeek; i++){
-        
+
         //Get date
         date.setDate(date.getDate() + 1);
-        const date_str = stringifyDate(date);
-        
+
         //Set date
         days_dates[i].textContent = `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}`;
 
@@ -232,33 +320,26 @@ function updateWeek(){
         while (days_contents[i].firstChild){
             days_contents[i].removeChild(days_contents[i].firstChild);
         }
-        
+
         //Get current day events
-        let day = null;
-        for (let j = 0; j < events.length; j++) { 
-            if (events[j].date === date_str){
-                day = events[j];
-                break;
-            }
-        }
-        if (!day){
+        let currentDayEvents = user_events[DateToStr(date)];
+        if (currentDayEvents === undefined){
             continue;
         }
 
         //Add new events
-        for (let y = 0; y < day.events.length; y++) {
-            const event = day.events[y];
-            if (event.checked & !show_checked_tasks){
+        for (let y = 0; y < currentDayEvents.length; y++) {
+            const event = currentDayEvents[y];
+            
+            //Event checked => not show in agenda
+            if (event.checked & !showCheckedTask){
                 continue;
             }
 
             //Get categories color
-            let card_color = "var(--accentValues)";
-            for (let z = 0; z < categories.length; z++) {
-                if (categories[z].id === event.cat){
-                    card_color = categories[z].color;
-                    break;
-                }                
+            let card_color = user_categories[event.cat].color;
+            if (card_color === undefined){
+                card_color = "var(--accentValues)";
             }
 
             //Create card
@@ -277,7 +358,7 @@ function updateWeek(){
 
             //Card click evet
             card.onclick = ()=>{
-                showTask(day, event);
+                showTask(event);
             };
 
         }
@@ -286,158 +367,68 @@ function updateWeek(){
 
 }
 
-///////////////////////
-////// CONNEXION //////
-///////////////////////
-function waitFor(condition) {
-    return new Promise((resolve, reject) => {
-        const interval = setInterval(() => {
-        if (condition()) {
-            clearInterval(interval);
-            resolve();
-        }
-      }, 50);
-    });
-  }
-onAuthStateChanged(auth, (user) => {
-    if (user) {
+//Get last week
+document.getElementById('week_left').addEventListener('click', ()=>{
+    current_monday.setDate(current_monday.getDate() - 7);
+    agenda_updateWeek();
+});
 
-        //No load week
-        let loadWeek = 0
+//Get next week
+document.getElementById('week_right').addEventListener('click', ()=>{
+    current_monday.setDate(current_monday.getDate() + 7);
+    agenda_updateWeek();
+});
 
-        //Get accent color
-        get(ref(db, `users/${auth.currentUser.uid}/accent`))
-        .then(snapshot=>{
-            settings_color.value = '#' + snapshot.val();
-            updateAccent();
-            loadWeek += 1;
-        })
-        .catch(error=>{
-            swal("Une erreur est survenu", 'Impossible de récupérer les données utilisateur. (./accent)', "error");
-        });
+//Settings change show_checked_task
+agenda_show_checked_tasks_btn.onclick = ()=>{
 
-        //Get saturday
-        get(ref(db, `users/${auth.currentUser.uid}/show_saturday`))
-        .then(snapshot=>{
-            settings_saturday.checked = snapshot.val();
-            updateSaturday();
-            loadWeek += 1;
-        })
-        .catch(error=>{
-            swal("Une erreur est survenu", 'Impossible de récupérer les données utilisateur. (./show_saturday)', "error");
-        });
+    //Get state
+    let state = agenda_show_checked_tasks_btn.getAttribute('checked') === 'true';
+    
+    //Update state
+    state = !state; 
+    agenda_show_checked_tasks_btn.setAttribute('checked', state);
 
-        //Show tasks
-        get(ref(db, `users/${auth.currentUser.uid}/show_checked_tasks`))
-        .then(snapshot=>{
-            show_checked_tasks = snapshot.val();
-            updateToggleShowCheckedTasksBtn();
-            loadWeek += 1;
-        })
-        .catch(error=>{
-            swal("Une erreur est survenu", 'Impossible de récupérer les données utilisateur. (./show_checked_tasks)', "error");
-        });
-
-        //Realtime update
-        const eventsRef = ref(db, `users/${user.uid}/events`);
-        onValue(eventsRef, (snapshot)=>{
-
-            //Get events
-            events = JSON.parse(snapshot.val());
-            if (!events){
-                events = [];
-            }
-
-            //Load user data
-            loadWeek += 1;
-
-        });
-
-        //Wait until everything is loaded
-        waitFor(()=>{loadWeek > 3}).then(()=>{
-            
-            //Load user data
-            document.getElementById('nav_btn_agenda').click();
-            
-            //Remove loader
-            loader.classList.add('loader-end');
-            setTimeout(() => {
-                loader.hidden = true;
-            }, 300);
-
-        });
-
+    //Update ui
+    if (state){
+        agenda_show_checked_tasks_btn.textContent = "Masquer les taches finies"
     } else {
-
-        // User need to sign in
-        window.location.href = "signin.html";
-
+        agenda_show_checked_tasks_btn.textContent = "Montrer les taches finies"
     }
-});
+    agenda_updateWeek();
 
-//////////////////////
-////// SIGN OUT //////
-//////////////////////
-document.getElementById('nav_btn_logout').addEventListener('click', ()=>{
-    signOut(auth)
-    .then(()=>{
-        window.location.href = "index.html";
-    })
-    .catch((err)=>{
-        swal("Une erreur est survenu", err.message, "error");
+    //Update database
+    update(ref(db, `users/${auth.currentUser.uid}/preferences`), {
+        show_checked_tasks: state
     });
-});
+}
 
-///////////////////////////
-////// LOAD SVG ICON //////
-///////////////////////////
-const nav_logo = document.getElementById('nav_logo');
-fetch(nav_logo.getAttribute("src"))
-.then(response => response.text())
-.then(svgText => {
-    const parser = new DOMParser();
-    const svgDoc = parser.parseFromString(svgText, "image/svg+xml");    
-    nav_logo.parentNode.replaceChild(svgDoc.documentElement, nav_logo);
-})
-.catch(error => {
-    console.error("Une erreur s'est produite lors du chargement du SVG :", error);
-});
+/////////////////////////
+////// PUSH EVENTS //////
+/////////////////////////
+function pushEvents(){
+    update(ref(db, `users/${auth.currentUser.uid}`),{
+        events: JSON.stringify(user_events)
+    });
+}
 
 ////////////////////////
-////// INPUT DATE //////
+////// CATEGORIES //////
 ////////////////////////
-function setInputDateToDate(elm, date) {
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    elm.value = `${year}-${month}-${day}`;
-}
-function InputDateToDate(value) {
-    const [year, month, day] = value.split('-');
-    return new Date(year, month - 1, day);
-}
-
-///////////////////////////////////////
-////// TOGGLE SHOW CHECKED TASKS //////
-///////////////////////////////////////
-const agenda_toggle_checked_tasks = document.getElementById('agenda_toggle_checked_tasks');
-var show_checked_tasks = false;
-
-agenda_toggle_checked_tasks.onclick = ()=>{
-    show_checked_tasks = !show_checked_tasks;
-    updateToggleShowCheckedTasksBtn();
-    updateWeek();
-    update(ref(db, `users/${auth.currentUser.uid}`), {
-        show_checked_tasks: settshow_checked_tasks
-    });
-}
-function updateToggleShowCheckedTasksBtn(){
-    if (show_checked_tasks){
-        agenda_toggle_checked_tasks.textContent = "Fermer les taches finies"
-    } else {
-        agenda_toggle_checked_tasks.textContent = "Montrer les taches finies"
+var user_categories = {
+    0:{
+        name: 'Mathématique',
+        color: '227, 114, 42'
+    },
+    1:{
+        name: 'Anglais',
+        color: '100, 256, 42'
+    },
+    2:{
+        name: 'Gestion de proj.',
+        color: '52, 124, 250'
     }
-}
+};
 
 //////////////////////
 ////// ADD TASK //////
@@ -450,16 +441,16 @@ const menu_addtask_cancel = document.getElementById('menu_addtask_cancel');
 const menu_addtask_validate = document.getElementById('menu_addtask_validate');
 
 document.getElementById('agenda_addtask_btn').addEventListener('click', ()=>{
-    setInputDateToDate(menu_addtask_date, currentDay);
+    menu_addtask_date.value = DateToStr(currentDay);
     menu_addtask_name.value = '';
     menu_addtask_desc.value = '';
     while (menu_addtask_cat.firstChild){
         menu_addtask_cat.removeChild(menu_addtask_cat.firstChild);
     }
-    for (let i = 0; i < categories.length; i++) {
+    for (let key in user_categories) {
         const option = document.createElement('option');
-        option.value = categories[i].id;
-        option.textContent = categories[i].name;
+        option.value = key;
+        option.textContent = user_categories[key].name;
         menu_addtask_cat.appendChild(option);
     }
     showMenu("menu_addtask");
@@ -478,24 +469,14 @@ menu_addtask_validate.onclick = ()=>{
     menu_container.click();
     
     //Get day
-    const date_str = stringifyDate(InputDateToDate(menu_addtask_date.value));
-    let day = null;
-    for (let i = 0; i < events.length; i++) { 
-        if (events[i].date === date_str){
-            day = events[i];
-            break;
-        }
-    }
-    if (!day){
-        day = {
-            date: date_str,
-            events: []
-        }
-        events.push(day);
+    let day = user_events[menu_addtask_date.value];
+    if (day === undefined){
+        user_events[menu_addtask_date.value] = [];
+        day = user_events[menu_addtask_date.value];
     }
 
     //Add event    
-    day.events.push({
+    day.push({
         "title": menu_addtask_name.value,
         "desc": menu_addtask_desc.value,
         "cat": menu_addtask_cat.value,
@@ -504,15 +485,6 @@ menu_addtask_validate.onclick = ()=>{
     //Push modification to database
     pushEvents();
 
-}
-
-/////////////////////////
-////// PUSH EVENTS //////
-/////////////////////////
-function pushEvents(){
-    update(ref(db, `users/${auth.currentUser.uid}`),{
-        events: JSON.stringify(events)
-    });
 }
 
 ////////////////////////
@@ -527,7 +499,7 @@ menu_showtask_close.onclick = ()=>{
     menu_container.click();
 }
 
-function showTask(day, event) {
+function showTask(event) {
 
     showMenu('menu_showtask');
     menu_showtask_name.textContent = event.title;
@@ -536,7 +508,8 @@ function showTask(day, event) {
 
     menu_showtask_checkbox.onclick = ()=>{
 
-        event.checked = true;
+        menu_container.click();
+        event.checked = menu_showtask_checkbox.checked;
         pushEvents();
 
     }
@@ -548,6 +521,7 @@ function showTask(day, event) {
 //////////////////
 const menu_container = document.getElementById('menu_container');
 
+//Show menu
 function showMenu(menuID) {
     
     const menu = document.getElementById(menuID);

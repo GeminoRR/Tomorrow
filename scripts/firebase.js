@@ -23,6 +23,6 @@ export { auth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEma
 
 
 // Initialize Realtime Database and get a reference to the service
-import { getDatabase, ref, set, onValue, update, get, remove } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
+import { getDatabase, ref, set, onValue, off, update, get, remove } from "https://www.gstatic.com/firebasejs/10.4.0/firebase-database.js";
 const db = getDatabase(app);
-export { db, ref, set, onValue, update, get, remove }
+export { db, ref, set, onValue, off, update, get, remove }

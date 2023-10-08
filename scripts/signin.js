@@ -51,10 +51,12 @@ create_btn.addEventListener('click', ()=>{
     .then((userCredential) => {
         // Signed in 
         set(ref(db, `users/${auth.currentUser.uid}`), {
-            events: '[]',
-            accent: '2C63DF',
-            show_saturday: false,
-            show_checked_tasks: false
+            events: '{}',
+            preferences: {
+                accent: '2C63DF',
+                show_saturday: false,
+                show_checked_tasks: false
+            }
         })
         .then(()=>{
             window.location.href = "app.html";
