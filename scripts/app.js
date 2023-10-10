@@ -221,6 +221,11 @@ function pages_handle_btn(btn_id, page_id, on_page_start, on_page_end) {
             on_page_start();
         }
 
+        //Hide panel (on mobile)
+        if (onMobile && nav.classList.contains('nav-mobile-showed')){
+            mobile_nav_btn.click()
+        }
+
     };
 }
 
@@ -277,6 +282,7 @@ function HexToColor(hex){
 const days_container = [document.getElementById('agenda_day1'), document.getElementById('agenda_day2'), document.getElementById('agenda_day3'), document.getElementById('agenda_day4'), document.getElementById('agenda_day5'), document.getElementById('agenda_day6')]
 const days_contents = [document.getElementById('agenda_day1_content'), document.getElementById('agenda_day2_content'), document.getElementById('agenda_day3_content'), document.getElementById('agenda_day4_content'), document.getElementById('agenda_day5_content'), document.getElementById('agenda_day6_content')]
 const days_dates = [document.getElementById('agenda_day1_date'), document.getElementById('agenda_day2_date'), document.getElementById('agenda_day3_date'), document.getElementById('agenda_day4_date'), document.getElementById('agenda_day5_date'), document.getElementById('agenda_day6_date')]
+const agenda_day1_name = document.getElementById('agenda_day1_name');
 const week_name = document.getElementById('week_name');
 const agenda_show_checked_tasks_btn = document.getElementById('agenda_show_checked_tasks_btn'); 
 
@@ -286,11 +292,11 @@ const currentDay = new Date();
 
 //Get this week monday
 function getMondayDate(date) {
-    const dayOfWeek = date.getDay();
-    const mondayOffset = dayOfWeek === 0 ? 1 : 8 - dayOfWeek;
-    const monday = new Date(date);
-    monday.setDate(date.getDate() + mondayOffset);
-    return monday;
+    const currentDate = new Date(date);
+    const currentDayOfWeek = currentDate.getDay();
+    const difference = currentDayOfWeek - 1;
+    currentDate.setDate(currentDate.getDate() - difference);
+    return currentDate;
 }
 current_monday = getMondayDate(currentDay);
 
@@ -319,6 +325,9 @@ function show_agenda(){
 
     });
 
+    //Set lundi
+    agenda_day1_name.textContent = "Lundi";
+
 
 }
 
@@ -340,6 +349,11 @@ function agenda_updateWeek(){
     let daysPerWeek = 5;
     if (settings_saturday_input.checked){
         daysPerWeek = 6;
+    }
+    if (onMobile){
+        daysPerWeek = 1;
+        let jour = current_monday.toLocaleDateString('fr-FR', { weekday: 'long' });
+        agenda_day1_name.textContent = jour.charAt(0).toUpperCase() + jour.slice(1);
     }
 
     //Show checked tasks
@@ -419,13 +433,32 @@ function agenda_updateWeek(){
 
 //Get last week
 document.getElementById('week_left').addEventListener('click', ()=>{
-    current_monday.setDate(current_monday.getDate() - 7);
+    if (onMobile){
+        current_monday.setDate(current_monday.getDate() - 1);
+        if (current_monday.getDay() === 0){
+            current_monday.setDate(current_monday.getDate() - 1);
+        }
+        if (current_monday.getDay() === 6 && !settings_saturday_input.checked){
+            current_monday.setDate(current_monday.getDate() - 1);
+        }
+    } else {
+        current_monday.setDate(current_monday.getDate() - 7);
+    }
     agenda_updateWeek();
 });
 
 //Get next week
 document.getElementById('week_right').addEventListener('click', ()=>{
-    current_monday.setDate(current_monday.getDate() + 7);
+    if (onMobile){
+        current_monday.setDate(current_monday.getDate() + 1);
+        if (current_monday.getDay() === 6 && !settings_saturday_input.checked){
+            current_monday.setDate(current_monday.getDate() + 2);
+        } else if (current_monday.getDay() === 0){
+            current_monday.setDate(current_monday.getDate() + 1);
+        }
+    } else {
+        current_monday.setDate(current_monday.getDate() + 7);
+    }
     agenda_updateWeek();
 });
 
@@ -798,3 +831,44 @@ function pushCategories(){
     });
 
 }
+
+////////////////////////
+////// MOBILE NAV //////
+////////////////////////
+const mobile_nav_btn = document.getElementById('mobile_nav_btn');
+const mobile_nav_btn_img = document.getElementById('mobile_nav_btn_img');
+const nav = document.getElementsByTagName('nav')[0];
+mobile_nav_btn.onclick = ()=>{
+    if (nav.classList.contains('nav-mobile-showed')){
+        mobile_nav_btn_img.src = 'ressources/header/menu.png';
+        nav.classList.remove('nav-mobile-showed');
+    } else {
+        mobile_nav_btn_img.src = 'ressources/header/back.png';
+        nav.classList.add('nav-mobile-showed');
+    }
+}
+
+var onMobile = false;
+const mediaQuery = window.matchMedia('(max-width: 600px)');
+function handleDeviceSizeChange(e) {
+    if (e.matches) {
+        onMobile = true;
+        for (let i = 1; i < days_container.length; i++){
+            days_container[i].hidden = true;
+        }
+        days_container[0].style.width = '100%';
+    } else {
+        onMobile = false;
+        for (let i = 1; i < days_container.length; i++){
+            days_container[i].hidden = false;
+        }
+        days_container[0].style.width = 'calc(100% / 5)';
+        current_monday = getMondayDate(current_monday);
+        if (document.getElementById('page_agenda').style.display == 'flex'){
+            hide_agenda();
+            show_agenda();
+        }
+    }
+}
+mediaQuery.addListener(handleDeviceSizeChange);
+handleDeviceSizeChange(mediaQuery);

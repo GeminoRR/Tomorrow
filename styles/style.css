@@ -63,7 +63,7 @@ body, html{
     background-color: var(--accent);
     color: white;
     text-align: center;
-    border-radius: 15px;
+    border-radius: 13px;
     font-size: 16px;
     transition-duration: 0.2s;
     cursor: pointer;
@@ -151,4 +151,126 @@ input[type="color"]::-webkit-color-swatch {
     border: none;
     border-radius: 0;
     padding: 0;
+}
+
+/* FOOTER */
+footer{
+    width: 100%;
+    height: auto;
+    padding: 30px;
+    background-color: rgb(var(--accentValues));
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+footer p, footer a{
+    color: white;
+    font-size: 16px;
+}
+
+/* MOBILE */
+@media only screen and (max-width: 600px) {
+    footer{
+        flex-direction: column;
+        justify-content: flex-start;
+        align-items: center;
+        gap: 10px;
+    }
+}
+
+/* HEADER */
+header{
+    position: fixed;
+    width: 100%;
+    padding: 15px 30px;
+    background-color: white;
+    border-bottom: 2px solid rgb(230, 230, 230);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+header > div:nth-child(1){
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+header > div:nth-child(1) > p{
+    font-size: 22px;
+}
+header > div:nth-child(1) > img{
+    width: 50px;
+    height: 50px;
+}
+
+header > div:nth-child(2){
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.header-blue-btn{
+    outline: none;
+    border: none;
+    width: 100%;
+    padding: 15px;
+    background-color: var(--accent);
+    color: white;
+    text-align: center;
+    border-radius: 15px;
+    font-size: 16px;
+    transition-duration: 0.2s;
+    cursor: pointer;
+}
+.header-blue-btn:hover{
+    background-color: rgba(var(--accentValues), 0.9);
+}
+.header-blue-btn:active{
+    transform: scale(0.98);
+}
+
+/* NAV MOBILE */
+@media only screen and (max-width: 600px) {
+    header{
+        position: fixed;
+        width: 100vw;
+        height: 100vh;
+        transition-duration: 0.2s;
+        transform: translateX(-100%);
+        z-index: 100;
+        
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: flex-start;
+        padding: 30px;
+    }
+    .mobile-btn{
+        display: initial !important;
+    }
+}
+.header-mobile-showed{
+    transform: translateX(0);
+}
+.mobile-btn{
+    display: none;
+    position: fixed;
+    z-index: 110;
+    top: 30px;
+    right: 30px;
+    width: 50px;
+    height: 50px;
+    border-radius: 10px;
+    border: 2px solid rgb(230, 230, 230);
+    background-color: white;
+}
+.mobile-btn img{
+    width: 100%;
+    height: 100%;
+    padding: 10px;
 }

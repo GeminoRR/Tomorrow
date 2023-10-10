@@ -93,6 +93,11 @@
 
     </div>
 
+    <!-- MOBILE BTN -->
+    <div class="mobile-btn" id="mobile_nav_btn">
+        <img src="ressources/header/menu.png" id="mobile_nav_btn_img">
+    </div>
+
     <!-- NAVIGATION -->
     <nav>
 
@@ -148,7 +153,7 @@
                 <div class="agenda-day" id="agenda_day1">
 
                     <p class="agenda-day-subtitle" id="agenda_day1_date">25/09</p>
-                    <p class="agenda-day-title">Lundi</p>
+                    <p class="agenda-day-title" id="agenda_day1_name">Lundi</p>
 
                     <div class="agenda-day-content" id="agenda_day1_content">
 
@@ -266,9 +271,9 @@
             <div class="settings-container">
 
                 <div class="settings-tile settings-delete-account">
-                    <p class="settings-tile-title">Suprimmer votre compte</p>
+                    <p class="settings-tile-title">Supprimer votre compte</p>
                     <p class="settings-tile-text">Supprimer votre compte va supprimer toutes vos informations de nos bases de données. Ainsi, vous ne pourrez plus vous connecter et n'aurez plus aucun accès à vos taches. Cette action est irréversible.</p>
-                    <button class="lambda-btn red-btn w100" id="delete_account_btn">Suprimmer le compte</button>
+                    <button class="lambda-btn red-btn w100" id="delete_account_btn">Supprimer le compte</button>
                 </div>
 
                 <div class="settings-tile settings-iu-color">
@@ -281,6 +286,12 @@
                     <p class="settings-tile-title">Afficher le Samedi</p>
                     <p class="settings-tile-text">Peu de personnes travaillent le samedi, cette option est donc désactivée par défaut. En l'activant vous aurez accès à l'affichage du samedi sur votre agenda. Désactiver cette option ne supprimera pas les taches prévues les samedis.</p>
                     <label><input type="checkbox" id="settings_saturday_input"> Afficher le samedi</label>
+                </div>
+
+                <div class="settings-tile settings-cgu">
+                    <p class="settings-tile-title">Conditions Général d'utilisation & Mentions légal</p>
+                    <button class="lambda-btn w100" onclick="window.location.href = 'cug.html'">Conditions Général d'utilisation</button>
+                    <button class="lambda-btn w100" onclick="window.location.href = 'mentions_legales.html'">Mentions légals</button>
                 </div>
 
             </div>
